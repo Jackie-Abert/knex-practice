@@ -1,62 +1,54 @@
+require('dotenv').config();
 const knex = require('knex');
-
 const knexInstance = knex({
-    client: 'pg',
-    connection: 'postgresql://dunder-mifflin@localhost/knex-practice',
+  client: 'pg',
+  connection: process.env.DB_URL
 });
-
 knexInstance('shopping-list')
-    .select('*')
-
-
-
-function searchByListItem(searchTerm) {
-knexInstance.from('shopping-list')
+  .select('*');
+function findListItem(searchTerm) {
+  knexInstance
     .select('name')
-    .where( 'name', 'ILIKE', `%${searchTerm}%`)
+    .from('shopping-list')
+    .where('name', 'ILIKE', `%${searchTerm}%`)
     .then(result => {
-        console.log(result)
-    })
+      console.log(result);
+    });
 }
-
-searchByListItem('cans')
-
-function paginatedShoppingList(pageNumber) {
-    const productsPerPage = 6
-    const offset = productsPerPage * (pageNumber - 1)
-    knexInstance.from('shopping-list')
-        .select('*')
-        .limit(productsPerPage)
-        .offset(offset)
-        .then(result => {
-            console.log(result)
-          })
+findListItem('burger');
+function paginateProducts(pageNumber) {
+  const offset = 6 * (pageNumber - 1)
+  knexInstance
+    .select('*')
+    .from('shopping_list')
+    .limit('6')
+    .offset(offset)
+    .then(result => {
+      console.log(result);
+    });
 }
-paginatedShoppingList(3)
-
-function addedAfterDate(daysAgo) {
-    knexInstance.from('shopping-list')
-        .select('name', 'price', 'checked', 'date_added', 'catagory')
-        .count('date_added AS date')
-        .where(
-            'date_added',
-            '>',
-            knexInstance.raw(`now() - '?? days'::INTERVAL`, daysAgo)
-        )
-        .groupBy('name')
-        .orderBy([
-            {column:'date', order:'ASC'}
-        ])
-        .then(result => {
-            console.log(result)
-          })
-
+paginateProducts(3);
+function daysViewed(daysAgo) {
+  knexInstance
+    .select('name', 'price', 'date_added', 'checked', 'category')
+    .from('shopping-list')
+    .where('date_added',
+      '>',
+      knexInstance.raw(`now() - '?? days'::INTERVAL`, daysAgo)
+    )
+    .then(result => {
+      console.log(result);
+    });
 }
-
-addedAfterDate(5)
-
-// function totalCostPerCatagory() {
-//     knexInstance.from('shopping-list')
-//         .select('*')
-
-// }
+daysViewed(5);
+function groupByPrice() {
+  knexInstance
+    .select('category')
+    .from('shopping-list')
+    .sum('price')
+    .groupBy('category')
+    .then(result => {
+      console.log(result);
+    });
+}
+groupByPrice();
