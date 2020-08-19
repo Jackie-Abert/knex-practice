@@ -4,12 +4,12 @@ const knexInstance = knex({
   client: 'pg',
   connection: process.env.DB_URL
 });
-knexInstance('shopping-list')
+knexInstance('shopping_list')
   .select('*');
 function findListItem(searchTerm) {
   knexInstance
     .select('name')
-    .from('shopping-list')
+    .from('shopping_list')
     .where('name', 'ILIKE', `%${searchTerm}%`)
     .then(result => {
       console.log(result);
@@ -31,7 +31,7 @@ paginateProducts(3);
 function daysViewed(daysAgo) {
   knexInstance
     .select('name', 'price', 'date_added', 'checked', 'category')
-    .from('shopping-list')
+    .from('shopping_list')
     .where('date_added',
       '>',
       knexInstance.raw(`now() - '?? days'::INTERVAL`, daysAgo)
@@ -44,7 +44,7 @@ daysViewed(5);
 function groupByPrice() {
   knexInstance
     .select('category')
-    .from('shopping-list')
+    .from('shopping_list')
     .sum('price')
     .groupBy('category')
     .then(result => {
