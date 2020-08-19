@@ -39,12 +39,13 @@ describe("Article service Object", function () {
       connection: process.env.TEST_DB_URL,
     });
   });
+  //problem one
   before(() => db("shopping_list").truncate());
 
   before(() => {
     return db.into("shopping_list").insert(testItems);
   });
-
+//problem two
   afterEach(() => db('shopping_list').truncate());
 
   after(() => db.destroy());
